@@ -1,4 +1,4 @@
-export const useSound = (audioUrl: string) => {
+export const useSound = (audioUrl: string, preload = false) => {
   let audioContext: AudioContext | null = null;
   let audioBuffer: AudioBuffer | null = null;
   let source: AudioBufferSourceNode | null = null;
@@ -31,7 +31,12 @@ export const useSound = (audioUrl: string) => {
   const playSound = async (loop = false) => {
     try {
       const context = initContext();
-      const buffer = await loadAudio();
+
+      if (preload && !audioBuffer) {
+        throw Error('If you use preloading, you need to call "loadAudio" function first');
+      }
+
+      const buffer = preload ? audioBuffer : await loadAudio();
 
       if (!buffer || !gainNode) return;
 
@@ -102,6 +107,7 @@ export const useSound = (audioUrl: string) => {
   };
 
   return {
+    loadAudio,
     playSound,
     stopSound,
     getVolume,
